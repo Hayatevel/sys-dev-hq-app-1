@@ -1,0 +1,74 @@
+{
+  /* --- Visual Studio Code Settings --- */
+  "files.encoding": "utf8", // ファイルのエンコーディングを UTF-8 に設定
+  "files.eol": "\n", // 改行コードを LF に設定
+  "files.trimTrailingWhitespace": true, // 保存時に行末の空白を削除
+  "files.trimFinalNewlines": true, // 保存時にファイル末尾の余分な改行を削除
+  "files.insertFinalNewline": true, // 保存時にファイル末尾に改行を追加
+  "editor.formatOnSave": true, // 保存時に自動でフォーマット
+  "editor.codeActionsOnSave": {
+    // 保存時に ESLint の自動修正を実行
+    "source.fixAll.eslint": "explicit" // 保存時に ESLint ですべての問題を修正
+  },
+  "editor.tabSize": 2, // エディタのタブサイズを2スペースに設定
+  /* --- HTML Settings --- */
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // HTML ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- CSS Settings --- */
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // CSS ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- JavaScript Settings --- */
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // JavaScript ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- TypeScript Settings --- */
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // TypeScript ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- JSX Settings --- */
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // JSX ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- TSX Settings --- */
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // TSX ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- Markdown Settings --- */
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // Markdown ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- JSON Settings --- */
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // JSON ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- Json with Comments Settings --- */
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // コメント付きJSONファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- YAML Settings --- */
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // YAML ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- SQL Settings --- */
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode" // SQL ファイルのデフォルトフォーマッターに Prettier を使用
+  },
+  /* --- Java Settings --- */
+  "java.format.settings.profile": "GoogleStyle", // Java のフォーマットプロファイルを Google Style に設定
+  "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml", // Java フォーマットに Google Style の XML を使用
+  "[java]": {
+    "editor.formatOnSave": true, // 保存時に Java ファイルをフォーマットしインポートを整理
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit" // 保存時に Java のインポートを整理
+    }
+  },
+  /*--- Tailwind CSS Settings ---*/
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  }
+}

@@ -1,0 +1,44 @@
+# GitHub Copilot Instructions
+
+## 基本方針
+
+- すべての回答は日本語で行ってください。
+- コードは読みやすく、保守しやすいように作成してください。
+- このプロジェクトは Devcontainer 環境を使用しています。プロジェクトの構成については `.devcontainer/` ディレクトリ内を参照してください。
+- バックエンドに Spring Boot を使用してください。 `backend/sysdevhqapp1backend` ディレクトリ内がバックエンドのコードスペースになっています。
+- フロントエンドに React を使用してください。 `frontend/sys-dev-hq-app-1-frontend` ディレクトリ内がフロントエンドのコードスペースになっています。
+- データベースは MySQL を使用してください。`db/init/init.sql` に初期化スクリプトがあるので、データベースのテーブルの新規作成や変更が必要な場合は、このスクリプトを編集してください。
+
+## コーディング規約
+
+- Java コードは https://kazurof.github.io/GoogleJavaStyle-ja/ (Google Java Style Guide) に従ってください。
+- パッケージはドメイン (関心) ごとに分けてください。Contoller、Service、Repository などのレイヤーごとにパッケージを分けるのは避けてください。
+- レイヤーをまたぐ依存関係は避けてください。例えば、Controller が直接 Repository にアクセスすることは避け、必ず Service を介してアクセスしてください。
+- 各レイヤーをまたぐ DTO (Data Transfer Object) を使用してデータをやり取りしてください。エンティティクラスを直接 Controller やフロントエンドに渡すことは避けてください。
+- Spring Boot のベストプラクティスについては https://spring.pleiades.io/spring-boot/docs/current/reference/htmlsingle/ (Spring Boot公式ドキュメント) を参照してください。
+- `backend/sysdevhqapp1backend/src/main/java/com/example/sysdevhqapp1backend` の下にレイヤーを作成してください。
+- pom.xml の編集をする場合は、必ず確認を取ってください。なるべく既存のライブラリを活用し、新しいライブラリの追加は最小限に抑えてください。
+- Java コードを編集した際は、最後にコンパイル確認を行ってエラーがないことを確認してください。
+- 作成する Java クラスやメソッドには Javadoc コメントを追加してください。必要に応じて、クラスやメソッドの説明、引数、戻り値、例外などを記載してください。@version は "1.0" としてください。@since は "2026-02-01" としてください。@author は "Hayate Aoki" としてください。
+- React コードは TypeScript を使用し、https://typescript-jp.gitbook.io/deep-dive/intro-1 (TypeScript Deep Dive) に従ってください。
+- React のベストプラクティスについては https://ja.reactjs.org/docs/getting-started.html (React公式ドキュメント) を参照してください。
+- TypeScript のコードには JSDoc コメントを追加してください。必要に応じて、関数やクラスの説明、引数、戻り値、例外などを記載してください。@version は "1.0" としてください。@since は "2026-02-01" としてください。@author は "Hayate Aoki" としてください。
+- package.json の編集をする場合は、必ず確認を取ってください。なるべく既存のライブラリを活用し、新しいライブラリの追加は最小限に抑えてください。
+- UI の実装には Material-UI を使用してください。すでに package.json に追加されています。https://mui.com/ (Material-UI公式ドキュメント) を参照してください。
+
+## 作成したいもの
+
+### タイピングゲーム
+
+#### 要件
+
+- ユーザーはアカウントの Sign Up と Login と Logout ができる。
+- ユーザーの認証には JWT (JSON Web Token) を使用する。
+- ユーザーはフロントエンドの画面でモダンな UI で実装されたタイピングゲームをプレイできる。
+- タイピングする文章はデータベースからランダムに取得される。
+- タイピングするお題は、各プログラミング言語 (Java, C++, Go, Python, JavaScript など主要言語) のダミーコードで1つあたり100文字程度のものとする。
+- ユーザーがタイピングを完了すると、WPM (Words Per Minute) と正確性 (Accuracy) が計算され、ユーザーのスコアとしてデータベースに保存される。
+- ユーザーは自分の過去のスコアを確認できる
+- ユーザーは他のユーザーとスコアを競えるランキング機能がある。
+- 管理者ユーザーを用意し、管理者のユーザーネームとパスワードでログインできるようにする。
+- 管理者ユーザーでログインすると管理者ページに飛べる UI を用意し、管理者ページでは既存のお題の参照、新しいタイピングお題の追加、既存のお題の編集、既存お題の削除ができる。
