@@ -8,10 +8,10 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.tdctechsupport.repos</groupId>
-	<artifactId>todo</artifactId>
+	<groupId>com.example</groupId>
+	<artifactId>sysdevhqapp1backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>todo</name>
+	<name>sysdevhqapp1backend</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
