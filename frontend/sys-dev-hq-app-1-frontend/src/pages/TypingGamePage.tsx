@@ -158,7 +158,36 @@ export const TypingGamePage: React.FC = () => {
                   lineHeight: 1.6,
                 }}
               >
-                {challenge.codeSnippet}
+                {challenge.codeSnippet.split("").map((char, index) => {
+                  let color = "#333"; // デフォルトの色（未入力）
+                  let backgroundColor = "transparent";
+
+                  if (index < input.length) {
+                    if (input[index] === char) {
+                      color = "#2e7d32"; // 緑色（正解）
+                      backgroundColor = "#e8f5e9"; // 薄い緑背景
+                    } else {
+                      color = "#d32f2f"; // 赤色（不正解）
+                      backgroundColor = "#ffebee"; // 薄い赤背景
+                    }
+                  } else if (index === input.length) {
+                    // 現在の入力位置
+                    backgroundColor = "#fff9c4"; // 黄色背景（カーソル位置）
+                  }
+
+                  return (
+                    <span
+                      key={index}
+                      style={{
+                        color,
+                        backgroundColor,
+                        fontWeight: index < input.length ? "bold" : "normal",
+                      }}
+                    >
+                      {char}
+                    </span>
+                  );
+                })}
               </Box>
             </Paper>
 
