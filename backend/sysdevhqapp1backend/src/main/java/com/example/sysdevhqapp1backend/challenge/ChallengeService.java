@@ -148,6 +148,40 @@ public class ChallengeService {
   }
 
   /**
+   * フィルタリング条件でチャレンジを検索
+   *
+   * @param language プログラミング言語（nullまたは空の場合は全言語）
+   * @param difficulty 難易度（nullまたは空の場合は全難易度）
+   * @param keyword コードスニペット内の検索キーワード（nullまたは空の場合は検索しない）
+   * @return チャレンジレスポンスのリスト
+   */
+  public List<ChallengeResponse> searchChallenges(String language, String difficulty,
+      String keyword) {
+    // パラメータの正規化
+    String normalizedLanguage =
+        (language != null && !language.trim().isEmpty()) ? language.trim() : null;
+    TypingChallenge.ChallengeDifficulty normalizedDifficulty = null;
+    if (difficulty != null && !difficulty.trim().isEmpty()) {
+      try {
+        normalizedDifficulty = TypingChallenge.ChallengeDifficulty.valueOf(difficulty.trim());
+      } catch (IllegalArgumentException e) {
+        logger.warn("Invalid difficulty value: {}", difficulty);
+      }
+    }
+    String normalizedKeyword =
+        (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
+    // フィルタリング実行
+    List<TypingChallenge> challenges = challengeRepository.findByFilters(normalizedLanguage,
+        normalizedDifficulty, normalizedKeyword);
+
+    logger.info("Search results: language={}, difficulty={}, keyword={}, count={}",
+        normalizedLanguage, normalizedDifficulty, normalizedKeyword, challenges.size());
+
+    return challenges.stream().map(this::convertToResponse).collect(Collectors.toList());
+  }
+
+  /**
    * エンティティをレスポンスDTOに変換
    *
    * @param challenge タイピングチャレンジエンティティ

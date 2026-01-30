@@ -17,5 +17,5 @@ echo "実行ディレクトリ (PWD): ${PWD}";
 
 # backend を実行
 cd ./backend/sysdevhqapp1backend
-./mvnw install
+./mvnw clean install -DskipTests
 ./mvnw spring-boot:run

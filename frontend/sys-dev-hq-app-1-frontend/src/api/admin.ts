@@ -2,6 +2,15 @@ import { apiClient } from "../utils/api";
 import type { TypingChallenge, ChallengeCreateRequest } from "../types";
 
 /**
+ * 検索・フィルタリング用のパラメータ型定義
+ */
+export interface ChallengeSearchParams {
+  language?: string;
+  difficulty?: string;
+  keyword?: string;
+}
+
+/**
  * 管理者用チャレンジAPI
  * @version 1.0
  * @since 2026-02-01
@@ -10,10 +19,22 @@ import type { TypingChallenge, ChallengeCreateRequest } from "../types";
 
 export const adminApi = {
   /**
-   * 全てのチャレンジを取得
+   * 全てのチャレンジを取得（検索・フィルタリング対応）
    */
-  getAllChallenges: async (): Promise<TypingChallenge[]> => {
-    return apiClient.get<TypingChallenge[]>("/admin/challenges");
+  getAllChallenges: async (
+    params?: ChallengeSearchParams,
+  ): Promise<TypingChallenge[]> => {
+    const queryParams = new URLSearchParams();
+    if (params?.language) queryParams.append("language", params.language);
+    if (params?.difficulty) queryParams.append("difficulty", params.difficulty);
+    if (params?.keyword) queryParams.append("keyword", params.keyword);
+
+    const queryString = queryParams.toString();
+    const url = queryString
+      ? `/admin/challenges?${queryString}`
+      : "/admin/challenges";
+
+    return apiClient.get<TypingChallenge[]>(url);
   },
 
   /**

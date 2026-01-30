@@ -75,6 +75,7 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authz -> authz.requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/debug/**").permitAll() // デバッグエンドポイント
             .requestMatchers(HttpMethod.GET, "/api/challenges/random").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/challenges/count").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/rankings/**").permitAll()

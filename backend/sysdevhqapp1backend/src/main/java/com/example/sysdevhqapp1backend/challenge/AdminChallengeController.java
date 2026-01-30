@@ -1,13 +1,20 @@
 package com.example.sysdevhqapp1backend.challenge;
 
-import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 /**
  * 管理者用チャレンジコントローラー チャレンジの作成、更新、削除エンドポイントを提供（管理者専用）
@@ -30,7 +37,20 @@ public class AdminChallengeController {
    * @return チャレンジレスポンスのリスト
    */
   @GetMapping
-  public ResponseEntity<List<ChallengeResponse>> getAllChallenges() {
+  public ResponseEntity<List<ChallengeResponse>> getAllChallenges(
+      @RequestParam(required = false) String language,
+      @RequestParam(required = false) String difficulty,
+      @RequestParam(required = false) String keyword) {
+
+    // フィルタリングパラメータが1つでも指定されている場合は検索を実行
+    if ((language != null && !language.isEmpty()) || (difficulty != null && !difficulty.isEmpty())
+        || (keyword != null && !keyword.isEmpty())) {
+      List<ChallengeResponse> challenges =
+          challengeService.searchChallenges(language, difficulty, keyword);
+      return ResponseEntity.ok(challenges);
+    }
+
+    // パラメータなしの場合は全件取得
     List<ChallengeResponse> challenges = challengeService.getAllChallenges();
     return ResponseEntity.ok(challenges);
   }

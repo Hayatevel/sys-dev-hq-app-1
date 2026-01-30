@@ -23,9 +23,16 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Stack,
+  Chip,
 } from "@mui/material";
-import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
-import { adminApi } from "../api/admin";
+import {
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Search as SearchIcon,
+  Clear as ClearIcon,
+} from "@mui/icons-material";
+import { adminApi, type ChallengeSearchParams } from "../api/admin";
 import type { TypingChallenge, ChallengeCreateRequest } from "../types";
 
 /**
@@ -40,7 +47,10 @@ export const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [editingChallenge, setEditingChallenge] =
+    useState<TypingChallenge | null>(null);
+  const [deletingChallenge, setDeletingChallenge] =
     useState<TypingChallenge | null>(null);
   const [formData, setFormData] = useState<ChallengeCreateRequest>({
     language: "",
@@ -49,12 +59,26 @@ export const AdminPage: React.FC = () => {
     difficulty: "MEDIUM",
   });
 
-  const loadChallenges = async () => {
+  // 検索・フィルタリング用のステート
+  const [searchParams, setSearchParams] = useState<ChallengeSearchParams>({
+    language: "",
+    difficulty: "",
+    keyword: "",
+  });
+
+  // 利用可能な言語のリスト（既存データから抽出）
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>([]);
+
+  const loadChallenges = async (filters?: ChallengeSearchParams) => {
     setLoading(true);
     setError("");
     try {
-      const data = await adminApi.getAllChallenges();
+      const data = await adminApi.getAllChallenges(filters);
       setChallenges(data);
+
+      // 言語リストを抽出（重複削除）
+      const languages = Array.from(new Set(data.map((c) => c.language))).sort();
+      setAvailableLanguages(languages);
     } catch (err) {
       setError("チャレンジの読み込みに失敗しました");
     } finally {
@@ -106,24 +130,64 @@ export const AdminPage: React.FC = () => {
       }
 
       handleCloseDialog();
-      loadChallenges();
+      loadChallenges(getActiveFilters());
     } catch (err) {
       setError("保存に失敗しました");
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("本当に削除しますか？")) {
-      return;
-    }
-
     try {
       await adminApi.deleteChallenge(id);
-      loadChallenges();
+      setOpenDeleteDialog(false);
+      setDeletingChallenge(null);
+      loadChallenges(getActiveFilters());
     } catch (err) {
       setError("削除に失敗しました");
     }
   };
+
+  const handleOpenDeleteDialog = (challenge: TypingChallenge) => {
+    setDeletingChallenge(challenge);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setDeletingChallenge(null);
+  };
+
+  // フィルタリング実行
+  const handleSearch = () => {
+    loadChallenges(getActiveFilters());
+  };
+
+  // フィルタークリア
+  const handleClearFilters = () => {
+    setSearchParams({
+      language: "",
+      difficulty: "",
+      keyword: "",
+    });
+    loadChallenges();
+  };
+
+  // アクティブなフィルターを取得
+  const getActiveFilters = (): ChallengeSearchParams | undefined => {
+    const filters: ChallengeSearchParams = {};
+    if (searchParams.language) filters.language = searchParams.language;
+    if (searchParams.difficulty) filters.difficulty = searchParams.difficulty;
+    if (searchParams.keyword) filters.keyword = searchParams.keyword;
+
+    return Object.keys(filters).length > 0 ? filters : undefined;
+  };
+
+  // アクティブフィルター数を計算
+  const activeFilterCount = [
+    searchParams.language,
+    searchParams.difficulty,
+    searchParams.keyword,
+  ].filter((v) => v && v.trim() !== "").length;
 
   if (loading) {
     return (
@@ -148,7 +212,121 @@ export const AdminPage: React.FC = () => {
           </Alert>
         )}
 
-        <Box sx={{ mb: 2 }}>
+        {/* 検索・フィルタリングセクション */}
+        <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            検索・フィルタリング
+            {activeFilterCount > 0 && (
+              <Chip
+                label={`${activeFilterCount}件のフィルター適用中`}
+                color="primary"
+                size="small"
+                sx={{ ml: 2 }}
+              />
+            )}
+          </Typography>
+          <Stack spacing={2}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 2,
+              }}
+            >
+              <FormControl sx={{ minWidth: 150, flex: 1 }} size="small">
+                <InputLabel>言語</InputLabel>
+                <Select
+                  value={searchParams.language || ""}
+                  onChange={(e) =>
+                    setSearchParams({
+                      ...searchParams,
+                      language: e.target.value,
+                    })
+                  }
+                  label="言語"
+                >
+                  <MenuItem value="">
+                    <em>すべて</em>
+                  </MenuItem>
+                  {availableLanguages.map((lang) => (
+                    <MenuItem key={lang} value={lang}>
+                      {lang}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl sx={{ minWidth: 150, flex: 1 }} size="small">
+                <InputLabel>難易度</InputLabel>
+                <Select
+                  value={searchParams.difficulty || ""}
+                  onChange={(e) =>
+                    setSearchParams({
+                      ...searchParams,
+                      difficulty: e.target.value,
+                    })
+                  }
+                  label="難易度"
+                >
+                  <MenuItem value="">
+                    <em>すべて</em>
+                  </MenuItem>
+                  <MenuItem value="EASY">EASY</MenuItem>
+                  <MenuItem value="MEDIUM">MEDIUM</MenuItem>
+                  <MenuItem value="HARD">HARD</MenuItem>
+                </Select>
+              </FormControl>
+
+              <TextField
+                sx={{ flex: 2 }}
+                size="small"
+                label="コードスニペット検索"
+                placeholder="キーワードを入力..."
+                value={searchParams.keyword || ""}
+                onChange={(e) =>
+                  setSearchParams({ ...searchParams, keyword: e.target.value })
+                }
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+              />
+
+              <Box sx={{ display: "flex", gap: 1, minWidth: 150 }}>
+                <Button
+                  variant="contained"
+                  startIcon={<SearchIcon />}
+                  onClick={handleSearch}
+                  sx={{ flex: 1 }}
+                >
+                  検索
+                </Button>
+                {activeFilterCount > 0 && (
+                  <IconButton
+                    color="default"
+                    onClick={handleClearFilters}
+                    title="フィルタークリア"
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                )}
+              </Box>
+            </Box>
+          </Stack>
+        </Paper>
+
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            {challenges.length}件のチャレンジ
+          </Typography>
           <Button variant="contained" onClick={() => handleOpenDialog()}>
             新規作成
           </Button>
@@ -199,7 +377,7 @@ export const AdminPage: React.FC = () => {
                     </IconButton>
                     <IconButton
                       color="error"
-                      onClick={() => handleDelete(challenge.id)}
+                      onClick={() => handleOpenDeleteDialog(challenge)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -276,6 +454,83 @@ export const AdminPage: React.FC = () => {
               disabled={!formData.language || !formData.codeSnippet}
             >
               保存
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* 削除確認モーダル */}
+        <Dialog
+          open={openDeleteDialog}
+          onClose={handleCloseDeleteDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ color: "error.main" }}>
+            チャレンジの削除
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" gutterBottom sx={{ mt: 2 }}>
+              以下のチャレンジを削除してもよろしいですか？
+            </Typography>
+            {deletingChallenge && (
+              <Paper
+                elevation={1}
+                sx={{
+                  p: 2,
+                  mt: 2,
+                  bgcolor: "grey.50",
+                  border: 1,
+                  borderColor: "grey.300",
+                }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  ID: {deletingChallenge.id}
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>言語:</strong> {deletingChallenge.language}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>難易度:</strong> {deletingChallenge.difficulty}
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>コードスニペット:</strong>
+                </Typography>
+                <Box
+                  sx={{
+                    mt: 1,
+                    p: 1,
+                    bgcolor: "grey.900",
+                    color: "grey.100",
+                    borderRadius: 1,
+                    fontFamily: "monospace",
+                    fontSize: "0.875rem",
+                    maxHeight: 200,
+                    overflow: "auto",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-all",
+                  }}
+                >
+                  {deletingChallenge.codeSnippet}
+                </Box>
+              </Paper>
+            )}
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              この操作は取り消せません。
+            </Alert>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDeleteDialog} variant="outlined">
+              キャンセル
+            </Button>
+            <Button
+              onClick={() =>
+                deletingChallenge && handleDelete(deletingChallenge.id)
+              }
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+            >
+              削除する
             </Button>
           </DialogActions>
         </Dialog>
